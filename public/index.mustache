@@ -18,7 +18,12 @@
     </form>
     {{#clicks}}
     <h4>You've clicked the button {{clicks}} times</h4>
-    {{/clicks}} {{/user}}
+    {{/clicks}}
+    <br>
+    <form action="/logout" method="post">
+        <button type="submit">Logout</button>
+    </form>
+    {{/user}}
 </body>
 
 </html>

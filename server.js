@@ -9,8 +9,8 @@ const session = require("express-session");
 const expressValidator = require("express-validator");
 const sessionConfig = require(path.join(__dirname, "/sessionConfig.js"));
 
-var users = [{ username: "joe", password: "password" }];
-var clicks = 0;
+var users = [];
+var clicks;
 
 // SET ENGINE
 app.engine("mustache", mustacheExpress());
@@ -32,6 +32,7 @@ app.get("/", (request, response) => {
         clicks: request.session.clicks
       });
     } else {
+      clicks = 0;
       response.render("index", { user: request.session.user });
     }
   } else {
@@ -55,6 +56,7 @@ app.post("/login", (request, response) => {
   }
   var requestingUser = request.body;
   var userRecord;
+
   if (users.length > 0) {
     users.forEach(verifiedUser => {
       if (requestingUser.username === verifiedUser.username) {
@@ -62,13 +64,13 @@ app.post("/login", (request, response) => {
           userRecord = verifiedUser;
           request.session.user = userRecord;
           response.redirect("/");
-        } else {
-          response.render("login");
         }
-      } else {
-        response.render("login");
       }
     });
+
+    if (!userRecord) {
+      response.render("login");
+    }
   } else {
     // handles special case for empty 'database' (i.e. users array)
     response.redirect("/signup");
@@ -81,8 +83,12 @@ app.get("/signup", (request, response) => {
 
 app.post("/users", (request, response) => {
   users.push(request.body);
-  console.log(users);
-  response.render("login");
+  response.redirect("/login");
+});
+
+app.post("/logout", (request, response) => {
+  request.session.destroy();
+  response.render("logout");
 });
 
 app.listen(port, () => {
