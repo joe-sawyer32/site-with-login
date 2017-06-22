@@ -82,8 +82,20 @@ app.get("/signup", (request, response) => {
 });
 
 app.post("/users", (request, response) => {
-  users.push(request.body);
-  response.redirect("/login");
+  console.log("users: ", users);
+  var newUserName = request.body.username;
+  var newUser = true;
+  users.forEach(verifiedUser => {
+    if (newUserName === verifiedUser.username) {
+      newUser = false;
+    }
+  });
+  if (newUser) {
+    users.push(request.body);
+    response.redirect("/login");
+  } else {
+    response.redirect("/signup");
+  }
 });
 
 app.post("/logout", (request, response) => {
