@@ -9,7 +9,8 @@ const session = require("express-session");
 const expressValidator = require("express-validator");
 const sessionConfig = require(path.join(__dirname, "/sessionConfig.js"));
 
-var users = [];
+var users = [{ username: "joe", password: "password" }];
+var clicks = 0;
 
 // SET ENGINE
 app.engine("mustache", mustacheExpress());
@@ -25,10 +26,23 @@ app.use(session(sessionConfig));
 //ROUTES
 app.get("/", (request, response) => {
   if (request.session.user) {
-    response.render("index");
+    if (request.session.clicks) {
+      response.render("index", {
+        user: request.session.user,
+        clicks: request.session.clicks
+      });
+    } else {
+      response.render("index", { user: request.session.user });
+    }
   } else {
     response.redirect("/login");
   }
+});
+
+app.post("/click", (request, response) => {
+  clicks++;
+  request.session.clicks = clicks;
+  response.redirect("/");
 });
 
 app.get("/login", (request, response) => {
